@@ -4,6 +4,8 @@ dotenv.config();
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+const Celebrity = require("./models/celebrity");
+const Movie = require("./models/movie");
 
 const app = express();
 
@@ -32,8 +34,49 @@ app.post("/celebrities/create", (req, res, next) => {
       res.redirect("/celebrities");
     })
     .catch((error) => {
-      res.redirect("celebrities/new-celebrity");
+      res.redirect("/celebrities/new-celebrity");
       //next(error);
+    });
+});
+
+app.get("/celebrities", (req, res, next) => {
+  Celebrity.find({})
+    .then((celebrities) => {
+      res.render("celebrities/celebrities", { celebrities }); // render NO slash
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
+app.get("/movies/create", (req, res, next) => {
+  res.render("movies/new-movie");
+});
+
+app.post("/movies/create", (req, res, next) => {
+  const { title, genre, plot, cast } = req.body;
+  Movie.create({
+    title,
+    genre,
+    plot,
+    cast,
+  })
+    .then(() => {
+      res.redirect("/movies");
+    })
+    .catch((error) => {
+      res.redirect("/movies/new-movie");
+      //next(error);
+    });
+});
+
+app.get("/movies", (req, res, next) => {
+  Movie.find({})
+    .then((movies) => {
+      res.render("movies/movies", { movies }); // render NO slash
+    })
+    .catch((error) => {
+      next(error);
     });
 });
 
