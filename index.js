@@ -26,16 +26,15 @@ app.get("/celebrities/create", (req, res, next) => {
 app.post("/celebrities/create", (req, res, next) => {
   const { name, occupation, catchPhrase } = req.body;
   Celebrity.create({
-    name: name,
-    occupation: occupation,
-    catchPhrase: catchPhrase,
+    name,
+    occupation,
+    catchPhrase,
   })
-    .then(() => {
+    .then((celebrity) => {
       res.redirect("/celebrities");
     })
     .catch((error) => {
-      res.redirect("/celebrities/new-celebrity");
-      //next(error);
+      res.render("/celebrities/new-celebrity");
     });
 });
 
@@ -50,7 +49,9 @@ app.get("/celebrities", (req, res, next) => {
 });
 
 app.get("/movies/create", (req, res, next) => {
-  res.render("movies/new-movie");
+  Celebrity.find().then((celebrities) => {
+    res.render("movies/new-movie", { celebrities });
+  });
 });
 
 app.post("/movies/create", (req, res, next) => {
@@ -61,17 +62,17 @@ app.post("/movies/create", (req, res, next) => {
     plot,
     cast,
   })
-    .then(() => {
+    .then((movie) => {
       res.redirect("/movies");
     })
     .catch((error) => {
-      res.redirect("/movies/new-movie");
-      //next(error);
+      res.render("/movies/new-movie");
     });
 });
 
 app.get("/movies", (req, res, next) => {
-  Movie.find({})
+  Movie.find()
+    .populate("cast")
     .then((movies) => {
       res.render("movies/movies", { movies }); // render NO slash
     })
